@@ -1,4 +1,4 @@
-FROM sharelatex/sharelatex:5.2.1
+FROM sharelatex/sharelatex:latest
 
 SHELL ["/bin/bash", "-cx"]
 
@@ -32,3 +32,10 @@ RUN apt-get install lilypond -y
 RUN TEXLIVE_FOLDER=$(find /usr/local/texlive/ -type d -name '20*') \
     && echo % enable shell-escape by default >> /$TEXLIVE_FOLDER/texmf.cnf \
     && echo shell_escape = t >> /$TEXLIVE_FOLDER/texmf.cnf
+
+RUN git clone https://github.com/yu-i-i/overleaf-cep.git overleaf-cep && \
+    mv overleaf-cep/services/web/modules/track-changes services/web/modules/track-changes && \
+    rm -rf overleaf-cep && \
+    sed -i "/moduleImportSequence:/a 'track-changes'," services/web/config/settings.defaults.js && \
+    sed -i 's/trackChangesAvailable: false/trackChangesAvailable: true/g' services/web/app/src/Features/Project/ProjectEditorHandler.js
+
